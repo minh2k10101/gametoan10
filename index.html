@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>⚔️ Math RPG Adventure - Ultimate Edition</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght|100;300;400;500;600;700&display=swap" rel="stylesheet">
+<title>⚔️ Math RPG Adventure - Hero Selection Edition</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 * {
     margin: 0;
@@ -33,6 +33,71 @@ body {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
+
+/* Màn hình chọn nhân vật */
+.hero-selection-screen {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(15, 23, 42, 0.95);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+.hero-select-title {
+    font-size: 32px;
+    margin-bottom: 30px;
+    font-weight: 700;
+    background: linear-gradient(90deg, #22d3ee, #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.hero-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    width: 100%;
+    max-width: 1000px;
+}
+.hero-select-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 25px;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.hero-select-card:hover {
+    transform: translateY(-10px);
+    border-color: #22d3ee;
+    background: rgba(34, 211, 238, 0.1);
+}
+.hero-select-icon {
+    font-size: 60px;
+    margin-bottom: 15px;
+}
+.hero-select-name {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+.hero-select-desc {
+    font-size: 13px;
+    opacity: 0.8;
+    margin-bottom: 15px;
+}
+.hero-select-skills {
+    font-size: 12px;
+    text-align: left;
+    background: rgba(0,0,0,0.2);
+    padding: 10px;
+    border-radius: 10px;
+}
+
+/* Layout Chính */
 .layout {
     display: grid;
     grid-template-columns: 350px 1fr;
@@ -85,6 +150,7 @@ body {
 .xp { background: linear-gradient(90deg, #06b6d4, #8b5cf6); }
 .enemy-hp-bar { background: linear-gradient(90deg, #f59e0b, #e11d48); }
 
+/* Thế giới game & Hiệu ứng */
 .world {
     position: relative;
     width: 100%;
@@ -140,6 +206,17 @@ body {
     50% { transform: translateY(-5px); }
     100% { transform: translateY(0); }
 }
+
+/* Đạn kỹ năng bay trên màn hình */
+.projectile {
+    position: absolute;
+    font-size: 35px;
+    z-index: 50;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    transition: left 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), top 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
 .damage-fx {
     position: absolute;
     color: #ef4444;
@@ -153,6 +230,8 @@ body {
     0% { opacity: 1; transform: translateY(0); }
     100% { opacity: 0; transform: translateY(-40px); }
 }
+
+/* Câu hỏi & Đáp án */
 .story-box {
     background: rgba(255, 255, 255, 0.06);
     padding: 20px;
@@ -242,9 +321,7 @@ body {
     background: linear-gradient(90deg, #8b5cf6, #06b6d4);
     color: white;
 }
-.controls button:hover { transform: translateY(-2px); }
 
-/* Bộ công cụ thêm câu hỏi */
 .editor {
     grid-column: 1 / -1;
     margin-top: 25px;
@@ -265,7 +342,6 @@ input, select {
     color: white;
     font-family: inherit;
 }
-input::placeholder { color: rgba(255,255,255,0.5); }
 .add-btn {
     width: 100%;
     padding: 16px;
@@ -273,7 +349,6 @@ input::placeholder { color: rgba(255,255,255,0.5); }
     background: linear-gradient(90deg, #06b6d4, #8b5cf6);
     color: white;
 }
-.add-btn:hover { transform: translateY(-2px); }
 .question-list {
     margin-top: 25px;
     display: grid;
@@ -284,7 +359,6 @@ input::placeholder { color: rgba(255,255,255,0.5); }
     background: rgba(255, 255, 255, 0.06);
     padding: 15px;
     border-radius: 15px;
-    border: 1px solid rgba(255,255,255,0.05);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -298,52 +372,39 @@ input::placeholder { color: rgba(255,255,255,0.5); }
     font-size: 13px;
 }
 
-.mobile-nav {
-    display: none;
-    justify-content: center;
-    gap: 20px;
-    margin-top: 15px;
-}
-.nav-btn {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    border: none;
-    background: rgba(255,255,255,0.2);
-    color: white;
-    font-size: 24px;
-    cursor: pointer;
-}
-
 @media(max-width: 1024px) {
     .layout { grid-template-columns: 1fr; }
-    .mobile-nav { display: flex; }
 }
 @media(max-width: 600px) {
     .answers { grid-template-columns: 1fr; }
     .editor-grid { grid-template-columns: 1fr; }
-    .header h1 { font-size: 32px; }
 }
 </style>
 </head>
 <body>
 
+<!-- MÀN HÌNH CHỌN NHÂN VẬT -->
+<div class="hero-selection-screen" id="heroSelectScreen">
+    <div class="hero-select-title">⚔️ CHỌN ANH HÙNG CỦA BẠN ⚔️</div>
+    <div class="hero-grid" id="heroSelectionGrid"></div>
+</div>
+
 <div class="game">
     <div class="header">
         <h1>⚔️ Math RPG Adventure</h1>
-        <p>Giải toán để đánh bại binh đoàn quái vật đang tiến lại gần!</p>
+        <p>Giải toán chính xác để phóng đại chiêu tiêu diệt quái vật!</p>
     </div>
 
     <div class="layout">
         <!-- PANEL TRÁI: THÔNG SỐ & KỸ NĂNG -->
         <div class="panel">
-            <div class="avatar">🧙</div>
-            <h3 style="text-align:center; margin-bottom: 10px;">Chiến Binh Toán Học</h3>
+            <div class="avatar" id="playerAvatar">🧙</div>
+            <h3 id="heroClassTxt" style="text-align:center; margin-bottom: 10px;">Chưa chọn</h3>
             
             <div class="stat">
                 📊 <b>Ải Hiện Tại:</b> <span id="waveTxt" style="color:#22d3ee; font-weight:700;">Wave 1</span><br>
-                👹 Quái còn lại ở Wave này: <span id="monsterCountTxt">1</span><br>
-                🏆 <b>Kỷ lục (Best Wave):</b> <span id="bestWaveTxt" style="color:#f43f5e;">1</span>
+                👹 Quái ở Wave này: <span id="monsterCountTxt">1</span><br>
+                🏆 <b>Kỷ lục:</b> <span id="bestWaveTxt" style="color:#f43f5e;">1</span>
             </div>
 
             <div class="stat">
@@ -361,13 +422,12 @@ input::placeholder { color: rgba(255,255,255,0.5); }
                 🪙 Vàng: <span id="coins" style="color:#fbbf24; font-weight:700;">50</span>
             </div>
 
-            <h4 style="margin-top:15px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:5px;">🔥 Hệ Thống Kỹ Năng</h4>
+            <h4 style="margin-top:15px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:5px;">🔥 Hệ Thống Kỹ Năng Riêng</h4>
             <div class="skills-grid" id="skillsGrid"></div>
         </div>
 
         <!-- KHU VỰC CHÍNH: TRẬN ĐẤU & SHOP -->
         <div class="main">
-            <!-- Khung đồ họa thế giới game -->
             <div class="world" id="gameWorld">
                 <div class="player" id="player">🧙</div>
                 <div class="enemy-container" id="enemyContainer">
@@ -377,13 +437,6 @@ input::placeholder { color: rgba(255,255,255,0.5); }
                     <div class="enemy" id="enemy">👹</div>
                 </div>
                 <div class="ground"></div>
-            </div>
-
-            <!-- Nút điều khiển cho điện thoại -->
-            <div class="mobile-nav">
-                <button class="nav-btn" onclick="movePlayer(-30)">◀</button>
-                <button class="nav-btn" onclick="playerJump()">▲</button>
-                <button class="nav-btn" onclick="movePlayer(30)">▶</button>
             </div>
 
             <!-- Cửa Hàng Bổ Trợ (Shop) -->
@@ -408,25 +461,24 @@ input::placeholder { color: rgba(255,255,255,0.5); }
 
             <!-- Khu vực câu hỏi -->
             <div class="story-box">
-                <div class="story" id="storyText">⚔️ Chuẩn bị, quái vật đang tiến lại gần bạn!</div>
+                <div class="story" id="storyText">⚔️ Chuẩn bị chiến đấu!</div>
                 <div class="question" id="question">Đang tải trận đấu...</div>
                 <div class="answers" id="answers"></div>
             </div>
 
             <div class="controls">
                 <button onclick="changeQuestion()" style="background:rgba(255,255,255,0.1); color:white;">🔀 Đổi Câu Khác</button>
+                <button onclick="openHeroSelection()" style="background:#8b5cf6;">🎭 Đổi Nhân Vật</button>
                 <button onclick="resetGame()" style="background: #ef4444;">♻️ Đặt Lại Trận</button>
             </div>
         </div>
 
-        <!-- BỘ CÔNG CỤ QUẢN LÝ CÂU HỎI (EDITOR) -->
+        <!-- BỘ CÔNG CỤ QUẢN LÝ CÂU HỎI -->
         <div class="editor">
             <h2>➕ Quản Lý & Thêm Câu Hỏi Mới</h2>
-            <p style="font-size: 14px; color: #a78bfa; margin-bottom: 15px;">Bạn có thể tự thêm các câu hỏi Toán mới vào đây để hiển thị trực tiếp trong game!</p>
-            
             <div class="editor-grid">
                 <div>
-                    <input type="text" id="newQuestion" placeholder="Nhập câu hỏi (Ví dụ: Giải phương trình x² - 5x + 6 = 0)">
+                    <input type="text" id="newQuestion" placeholder="Nhập câu hỏi (Ví dụ: 5 + 5 = ?)">
                     <input type="text" id="ans1" placeholder="Nhập đáp án A">
                     <input type="text" id="ans2" placeholder="Nhập đáp án B">
                 </div>
@@ -441,37 +493,68 @@ input::placeholder { color: rgba(255,255,255,0.5); }
                     </select>
                 </div>
             </div>
-            
-            <button class="add-btn" onclick="addQuestion()">➕ Lưu & Thêm Vào Ngân Hàng Đề</button>
-            
-            <h3 style="margin-top: 30px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;">📚 Ngân Hàng Câu Hỏi Hiện Có</h3>
+            <button class="add-btn" onclick="addQuestion()">➕ Lưu Vào Ngân Hàng Đề</button>
+            <h3 style="margin-top: 30px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;">📚 Danh Sách Câu Hỏi</h3>
             <div class="question-list" id="questionList"></div>
         </div>
     </div>
 </div>
 
 <script>
-// --- Ngân hàng câu hỏi Toán 10 mặc định ---
+// --- Ngân hàng câu hỏi ---
 let questions = [
-    { question: "Cho tập hợp A = [1; 5] và B = (3; 7). Tìm giao của hai tập hợp A ∩ B.", answers: ["(3; 5]", "[1; 7)", "(1; 3)", "[3; 5]"], correct: 0 },
+    { question: "Cho tập hợp A = [1; 5] và B = (3; 7). Tìm giao A ∩ B.", answers: ["(3; 5]", "[1; 7)", "(1; 3)", "[3; 5]"], correct: 0 },
     { question: "Tìm tọa độ đỉnh I của parabol y = x² - 4x + 3.", answers: ["I(2; -1)", "I(-2; 15)", "I(4; 3)", "I(2; 1)"], correct: 0 },
-    { question: "Cho tam giác ABC có b=6, c=8 và góc A = 60 độ. Tính độ dài cạnh a.", answers: ["a = 2√13", "a = 10", "a = 2√37", "a = 52"], correct: 0 },
-    { question: "Trong mặt phẳng tọa độ, cho vectơ u = (2; 3) và v = (4; -1). Tính tích vô hướng u.v", answers: ["5", "11", "14", "-2"], correct: 0 },
+    { question: "Cho tam giác ABC có b=6, c=8 và góc A = 60°. Tính cạnh a.", answers: ["a = 2√13", "a = 10", "a = 2√37", "a = 52"], correct: 0 },
+    { question: "Cho vectơ u = (2; 3) và v = (4; -1). Tính tích vô hướng u.v", answers: ["5", "11", "14", "-2"], correct: 0 },
     { question: "Tập xác định của hàm số y = √(2x - 4) là gì?", answers: ["x ≥ 2", "x > 2", "x ≤ 2", "x ≠ 2"], correct: 0 }
 ];
 
-// --- Hệ thống Kỹ năng ---
-let skills = [
-    { id: 0, name: "Đòn Cơ Bản", icon: "⚔️", dmg: 15, cost: 0, unlocked: true },
-    { id: 1, name: "Hỏa Cầu Đại Số", icon: "🔥", dmg: 30, cost: 40, unlocked: false },
-    { id: 2, name: "Sét Đánh Vectơ", icon: "⚡", dmg: 55, cost: 80, unlocked: false },
-    { id: 3, name: "Băng Phong Hình Học", icon: "❄️", dmg: 90, cost: 150, unlocked: false },
-    { id: 4, name: "Nộ Long Vi Tích Phân", icon: "🐲", dmg: 160, cost: 300, unlocked: false }
+// --- DỮ LIỆU NHÂN VẬT VÀ HIỆU ỨNG CHIÊU THỨC ---
+const HERO_CLASSES = [
+    {
+        id: "wizard",
+        name: "Pháp Sư Đại Số",
+        icon: "🧙",
+        maxHp: 100,
+        skills: [
+            { id: 0, name: "Tia Sét Biến Số", icon: "⚡", fx: "⚡", dmg: 15, cost: 0, unlocked: true },
+            { id: 1, name: "Quả Cầu Lửa Hàm Số", icon: "🔥", fx: "🔥", dmg: 35, cost: 40, unlocked: false },
+            { id: 2, name: "Bão Tuyết Ma Trận", icon: "❄️", fx: "❄️", dmg: 75, cost: 100, unlocked: false },
+            { id: 3, name: "Nộ Long Vi Tích Phân", icon: "🐲", fx: "🐉", dmg: 160, cost: 250, unlocked: false }
+        ]
+    },
+    {
+        id: "assassin",
+        name: "Sát Thủ Đạo Hàm",
+        icon: "🥷",
+        maxHp: 85,
+        skills: [
+            { id: 0, name: "Phi Tiêu Tọa Độ", icon: "🗡️", fx: "🗡️", dmg: 20, cost: 0, unlocked: true },
+            { id: 1, name: "Độc Kích Tiếp Tuyến", icon: "🧪", fx: "🧪", dmg: 40, cost: 45, unlocked: false },
+            { id: 2, name: "Bóng Ma Giới Hạn", icon: "👥", fx: "👁️", dmg: 80, cost: 110, unlocked: false },
+            { id: 3, name: "Ám Sát Vô Cực", icon: "💥", fx: "🔮", dmg: 180, cost: 260, unlocked: false }
+        ]
+    },
+    {
+        id: "archer",
+        name: "Cung Thủ Hình Học",
+        icon: "🏹",
+        maxHp: 115,
+        skills: [
+            { id: 0, name: "Bắn Thẳng Vectơ", icon: "🏹", fx: "🏹", dmg: 12, cost: 0, unlocked: true },
+            { id: 1, name: "Mũi Tên Đan Chéo Tang", icon: "🎯", fx: "📐", dmg: 30, cost: 35, unlocked: false },
+            { id: 2, name: "Mưa Tên Sin Cos", icon: "⛈️", fx: "🏹", dmg: 70, cost: 90, unlocked: false },
+            { id: 3, name: "Mũi Tên Tích Vô Hướng", icon: "✨", fx: "⭐", dmg: 150, cost: 230, unlocked: false }
+        ]
+    }
 ];
 
-// --- Biến Trạng Thái Game ---
-let current = 0;
+// --- Biến Trạng Thái Trận Đấu ---
+let currentHero = HERO_CLASSES[0]; 
+let skills = JSON.parse(JSON.stringify(currentHero.skills)); // Sao chép kỹ năng để lưu trạng thái unlock
 let selectedSkillId = 0;
+let current = 0;
 
 let hp = 100;
 let maxHp = 100;
@@ -479,17 +562,15 @@ let xp = 0;
 let level = 1;
 let coins = 50;
 
-// Hệ thống Wave quái vật
 let currentWave = 1;
 let bestWave = localStorage.getItem("math_rpg_best_wave") ? parseInt(localStorage.getItem("math_rpg_best_wave")) : 1;
 let monstersLeftInWave = 1; 
 let monsterMaxHp = 30;
 let currentMonsterHp = 30;
 let monsterX = 800; 
-let monsterSpeed = 1.0; 
+let monsterSpeed = 0.8; 
 let monsterDmg = 15;
 
-// Khởi tạo các trạng thái buff
 let hasX2Damage = false;
 let hasX2Xp = false;
 
@@ -502,45 +583,78 @@ const questionEl = document.getElementById("question");
 const answersEl = document.getElementById("answers");
 
 let playerX = 50;
-let playerY = 0;
-let isJumping = false;
 
 function initGame() {
-    renderSkills();
-    loadQuestion();
+    renderHeroSelection();
     showQuestionList();
-    updateStats();
-    updatePlayer();
     
-    // Vòng lặp quái vật di chuyển tự động tiếp cận người chơi
+    // Vòng lặp quái vật tiếp cận
     setInterval(() => {
         if (hp > 0 && currentMonsterHp > 0) {
-            if (monsterX > playerX + 40) {
+            if (monsterX > playerX + 50) {
                 monsterX -= monsterSpeed;
                 enemyContainerEl.style.left = monsterX + "px";
             } else {
-                // Tiếp cận sát sạt -> quái cắn liên tục làm tụt máu dần
-                hp -= 0.4;
-                if (hp <= 0) {
-                    hp = 0;
-                    handleGameOver();
-                }
+                hp -= 0.5; // Quái tấn công cận chiến liên tục nếu chạm người chơi
+                if (hp <= 0) { hp = 0; handleGameOver(); }
                 updateStats();
             }
         }
     }, 30);
 }
 
-// --- Hiển thị câu hỏi ra màn hình ---
+// RENDER MÀN HÌNH CHỌN NHÂN VẬT
+function renderHeroSelection() {
+    const grid = document.getElementById("heroSelectionGrid");
+    grid.innerHTML = "";
+    HERO_CLASSES.forEach(hero => {
+        const card = document.createElement("div");
+        card.className = "hero-select-card";
+        card.onclick = () => selectHero(hero);
+        
+        let skillsList = hero.skills.map(s => `${s.icon} ${s.name} (ST: ${s.dmg})`).join("<br>");
+        
+        card.innerHTML = `
+            <div class="hero-select-icon">${hero.icon}</div>
+            <div class="hero-select-name">${hero.name}</div>
+            <div class="hero-select-desc">Máu khởi điểm: ${hero.maxHp} HP</div>
+            <div class="hero-select-skills"><b>Kỹ năng:</b><br>${skillsList}</div>
+        `;
+        grid.appendChild(card);
+    });
+}
+
+function openHeroSelection() {
+    document.getElementById("heroSelectScreen").style.display = "flex";
+}
+
+function selectHero(hero) {
+    currentHero = hero;
+    skills = JSON.parse(JSON.stringify(hero.skills)); // Reset và tải bộ kỹ năng mới
+    selectedSkillId = 0;
+    
+    maxHp = hero.maxHp + (level - 1) * 15;
+    hp = maxHp; // Hồi đầy máu khi đổi nhân vật
+    
+    document.getElementById("playerAvatar").innerText = hero.icon;
+    document.getElementById("player").innerText = hero.icon;
+    document.getElementById("heroClassTxt").innerText = hero.name;
+    
+    document.getElementById("heroSelectScreen").style.display = "none";
+    
+    resetMonsterPosition();
+    renderSkills();
+    loadQuestion();
+    updateStats();
+}
+
 function loadQuestion() {
     if (questions.length === 0) {
-        questionEl.innerText = "Hết câu hỏi trong kho đề! Hãy thêm câu hỏi ở dưới.";
+        questionEl.innerText = "Hết câu hỏi trong kho đề! Hãy tạo thêm ở khung bên dưới.";
         answersEl.innerHTML = "";
         return;
     }
-    if (current >= questions.length) {
-        current = 0;
-    }
+    if (current >= questions.length) current = 0;
     
     const q = questions[current];
     questionEl.innerText = q.question;
@@ -558,10 +672,10 @@ function loadQuestion() {
 function changeQuestion() {
     current = Math.floor(Math.random() * questions.length);
     loadQuestion();
-    document.getElementById("storyText").innerText = "🔄 Đã đổi ngẫu nhiên sang một thử thách khác!";
+    document.getElementById("storyText").innerText = "🔄 Đã đổi ngẫu nhiên sang thử thách khác!";
 }
 
-// --- Kiểm tra câu trả lời ---
+// KIỂM TRA ĐÁP ÁN & KÍCH HOẠT HIỆU ỨNG CHIÊU THỨC BAY
 function checkAnswer(index, btn) {
     if (questions.length === 0) return;
     const q = questions[current];
@@ -569,50 +683,74 @@ function checkAnswer(index, btn) {
     buttons.forEach(b => b.disabled = true);
     
     if (index === q.correct) {
-        // Đúng -> Tấn công quái
         btn.classList.add("correct");
         
         let activeSkill = skills[selectedSkillId];
         let totalDmg = activeSkill.dmg;
         if (hasX2Damage) totalDmg *= 2;
         
-        currentMonsterHp -= totalDmg;
-        if (currentMonsterHp < 0) currentMonsterHp = 0;
+        // --- TẠO HIỆU ỨNG HÌNH ẢNH SKILL BAY ---
+        createProjectileEffect(activeSkill.fx, () => {
+            // Hiệu ứng chạy xong mới trừ máu quái và hiện số damage
+            currentMonsterHp -= totalDmg;
+            if (currentMonsterHp < 0) currentMonsterHp = 0;
+            
+            showDamageEffect(monsterX, totalDmg, "#22d3ee");
+            updateStats();
+            
+            if (currentMonsterHp <= 0) {
+                setTimeout(handleMonsterDefeated, 400);
+            } else {
+                setTimeout(loadQuestion, 600);
+            }
+        });
         
-        showDamageEffect(monsterX, totalDmg, "#22d3ee");
-        document.getElementById("storyText").innerText = `🎉 Chính xác! Bạn tung chiêu [${activeSkill.name}] gây ${totalDmg} sát thương!`;
-        
-        if (currentMonsterHp <= 0) {
-            setTimeout(handleMonsterDefeated, 600);
-        } else {
-            setTimeout(nextQuestion, 1000);
-        }
+        document.getElementById("storyText").innerText = `🎉 Chính xác! Bạn tung chiêu [${activeSkill.name}]!`;
+        current++;
     } else {
-        // Sai -> Quái vả người chơi
         btn.classList.add("wrong");
         buttons[q.correct].classList.add("correct");
         
         hp -= monsterDmg;
         if (hp < 0) hp = 0;
         
-        showDamageEffect(playerX, monsterDmg, "#ef4444");
-        document.getElementById("storyText").innerText = `💀 Sai rồi! Quái vật chớp thời cơ đánh bạn mất ${monsterDmg} HP!`;
+        showDamageEffect(playerX + 20, monsterDmg, "#ef4444");
+        document.getElementById("storyText").innerText = `💀 Sai rồi! Quái vật phản công khiến bạn mất ${monsterDmg} HP!`;
         
         if (hp <= 0) {
-            setTimeout(handleGameOver, 600);
+            setTimeout(handleGameOver, 800);
         } else {
-            setTimeout(nextQuestion, 1200);
+            setTimeout(loadQuestion, 1200);
+            current++;
         }
     }
     updateStats();
 }
 
-function nextQuestion() {
-    current++;
-    loadQuestion();
+// HÀM TẠO HIỆU ỨNG SKILL DI CHUYỂN
+function createProjectileEffect(fxSymbol, callback) {
+    const proj = document.createElement("div");
+    proj.className = "projectile";
+    proj.innerText = fxSymbol;
+    
+    // Điểm xuất phát từ vị trí Nhân vật
+    proj.style.left = (playerX + 50) + "px";
+    proj.style.top = "230px"; 
+    gameWorldEl.appendChild(proj);
+    
+    // Kích hoạt bay tới vị trí quái vật bằng tinh chỉnh CSS Transition
+    setTimeout(() => {
+        proj.style.left = monsterX + "px";
+        proj.style.top = "230px";
+    }, 50);
+    
+    // Sau khi bay tới nơi (0.5 giây), xóa vật thể và chạy hàm trừ máu quái
+    setTimeout(() => {
+        proj.remove();
+        callback();
+    }, 550);
 }
 
-// --- Xử lý khi quái chết ---
 function handleMonsterDefeated() {
     let earnedXp = 25 * currentWave;
     let earnedCoins = 15 + (currentWave * 2);
@@ -625,8 +763,8 @@ function handleMonsterDefeated() {
         xp -= 100;
         level++;
         maxHp += 15;
-        hp = maxHp; // Hồi đầy máu khi thăng cấp
-        document.getElementById("storyText").innerText = `🌟 TUYỆT VỜI! Bạn đã thăng lên Level ${level}!`;
+        hp = maxHp;
+        document.getElementById("storyText").innerText = `🌟 TUYỆT VỜI! Bạn nâng cấp lên Level ${level}!`;
     }
     
     monstersLeftInWave--;
@@ -637,25 +775,27 @@ function handleMonsterDefeated() {
             bestWave = currentWave;
             localStorage.setItem("math_rpg_best_wave", bestWave);
         }
-        document.getElementById("storyText").innerText = `⚔️ Quét sạch Wave! Sẵn sàng bước sang Wave ${currentWave}!`;
+        document.getElementById("storyText").innerText = `⚔️ Vượt ải! Chuẩn bị tiến vào Wave ${currentWave}!`;
         monstersLeftInWave = currentWave <= 10 ? currentWave : 10;
     }
     
     spawnNextMonster();
-    nextQuestion();
     updateStats();
 }
 
 function spawnNextMonster() {
     monsterMaxHp = 25 + (currentWave * 8);
     currentMonsterHp = monsterMaxHp;
-    monsterSpeed = 1.0 + (currentWave * 0.15);
+    monsterSpeed = 0.7 + (currentWave * 0.12);
     monsterDmg = 12 + (currentWave * 2);
     
     const monsterEmojis = ["👹", "👾", "🐉", "👻", "👽", "🤖"];
     document.getElementById("enemy").innerText = monsterEmojis[Math.floor(Math.random() * monsterEmojis.length)];
-    
-    monsterX = gameWorldEl.clientWidth - 100;
+    resetMonsterPosition();
+}
+
+function resetMonsterPosition() {
+    monsterX = gameWorldEl.clientWidth - 90;
     enemyContainerEl.style.left = monsterX + "px";
 }
 
@@ -665,12 +805,12 @@ function showDamageEffect(xCoord, text, color) {
     fx.innerText = text;
     fx.style.left = xCoord + "px";
     fx.style.color = color;
-    fx.style.bottom = "150px";
+    fx.style.bottom = "140px";
     gameWorldEl.appendChild(fx);
     setTimeout(() => fx.remove(), 800);
 }
 
-// --- Render hệ thống Kỹ năng ---
+// RENDER DANH SÁCH KỸ NĂNG THEO NHÂN VẬT ĐANG CHỌN
 function renderSkills() {
     const container = document.getElementById("skillsGrid");
     container.innerHTML = "";
@@ -697,7 +837,7 @@ function renderSkills() {
                     selectedSkillId = skill.id;
                     renderSkills();
                     updateStats();
-                    document.getElementById("storyText").innerText = `✨ Đã mở khóa thành công kỹ năng: [${skill.name}]!`;
+                    document.getElementById("storyText").innerText = `✨ Mở khóa thành công kỹ năng: [${skill.name}]!`;
                 } else {
                     alert("Bạn không đủ Vàng để mua kỹ năng này!");
                 }
@@ -707,45 +847,37 @@ function renderSkills() {
     });
 }
 
-// --- Cửa hàng nâng cấp tiện ích ---
 function buyShopItem(itemType) {
     if (itemType === 'heal') {
         if (coins >= 25) {
-            coins -= 25;
-            hp += 40;
+            coins -= 25; hp += 40;
             if (hp > maxHp) hp = maxHp;
-            document.getElementById("storyText").innerText = "❤️ Đã dùng bình thuốc! Hồi phục 40 Máu.";
-        } else { alert("Không đủ vàng!"); }
+            document.getElementById("storyText").innerText = "❤️ Hồi 40 Máu!";
+        } else alert("Không đủ vàng!");
     } 
     else if (itemType === 'x2damage') {
-        if (hasX2Damage) { alert("Bạn đã sở hữu hiệu ứng này rồi!"); return; }
+        if (hasX2Damage) return alert("Đã mua vật phẩm này rồi!");
         if (coins >= 60) {
-            coins -= 60;
-            hasX2Damage = true;
+            coins -= 60; hasX2Damage = true;
             document.getElementById("shopX2Dam").style.background = "rgba(34, 211, 238, 0.3)";
-            document.getElementById("storyText").innerText = "⚔️ Đã kích hoạt sát thương nhân đôi (X2 Damage) vĩnh viễn!";
-        } else { alert("Không đủ vàng!"); }
+        } else alert("Không đủ vàng!");
     } 
     else if (itemType === 'x2xp') {
-        if (hasX2Xp) { alert("Bạn đã sở hữu hiệu ứng này rồi!"); return; }
+        if (hasX2Xp) return alert("Đã mua vật phẩm này rồi!");
         if (coins >= 50) {
-            coins -= 50;
-            hasX2Xp = true;
+            coins -= 50; hasX2Xp = true;
             document.getElementById("shopX2Xp").style.background = "rgba(139, 92, 246, 0.3)";
-            document.getElementById("storyText").innerText = "🧪 Đã kích hoạt nhân đôi kinh nghiệm (X2 XP) vĩnh viễn!";
-        } else { alert("Không đủ vàng!"); }
+        } else alert("Không đủ vàng!");
     }
     updateStats();
 }
 
-// --- Đồng bộ hóa chỉ số lên UI ---
 function updateStats() {
     document.getElementById("hpText").innerText = `${Math.ceil(hp)} / ${maxHp}`;
     document.getElementById("hpBar").style.width = (hp / maxHp * 100) + "%";
     document.getElementById("xpBar").style.width = xp + "%";
     document.getElementById("level").innerText = level;
     document.getElementById("coins").innerText = coins;
-    
     document.getElementById("waveTxt").innerText = `Wave ${currentWave}`;
     document.getElementById("monsterCountTxt").innerText = monstersLeftInWave;
     document.getElementById("bestWaveTxt").innerText = bestWave;
@@ -754,139 +886,58 @@ function updateStats() {
     enemyHpBarEl.style.width = enemyHpPercent + "%";
 }
 
-// --- Thao tác với danh sách câu hỏi tự chế (Editor) ---
+// --- Quản lý câu hỏi (Editor) ---
 function addQuestion() {
-    const questionVal = document.getElementById("newQuestion").value;
+    const qVal = document.getElementById("newQuestion").value;
     const a1 = document.getElementById("ans1").value;
     const a2 = document.getElementById("ans2").value;
     const a3 = document.getElementById("ans3").value;
     const a4 = document.getElementById("ans4").value;
-    const correctVal = parseInt(document.getElementById("correctAnswer").value);
+    const cVal = parseInt(document.getElementById("correctAnswer").value);
     
-    if (questionVal.trim() === "" || a1.trim() === "" || a2.trim() === "") {
-        alert("Vui lòng nhập tối thiểu nội dung câu hỏi và ít nhất 2 đáp án đầu tiên!");
-        return;
-    }
+    if (!qVal.trim() || !a1.trim() || !a2.trim()) return alert("Vui lòng điền câu hỏi và ít nhất 2 câu trả lời!");
     
-    questions.push({
-        question: questionVal,
-        answers: [a1, a2, a3 || "Trống", a4 || "Trống"],
-        correct: correctVal
-    });
-    
-    // Reset form nhập liệu
+    questions.push({ question: qVal, answers: [a1, a2, a3||"Trống", a4||"Trống"], correct: cVal });
     document.getElementById("newQuestion").value = "";
-    document.getElementById("ans1").value = "";
-    document.getElementById("ans2").value = "";
-    document.getElementById("ans3").value = "";
-    document.getElementById("ans4").value = "";
+    document.getElementById("ans1").value = ""; document.getElementById("ans2").value = "";
+    document.getElementById("ans3").value = ""; document.getElementById("ans4").value = "";
     
     showQuestionList();
-    if (questions.length === 1) loadQuestion(); // Tự động load nếu trước đó kho rỗng
-    alert("✅ Đã lưu câu hỏi mới vào kho thành công!");
+    loadQuestion();
+    alert("✅ Đã thêm câu hỏi thành công!");
 }
 
 function showQuestionList() {
-    const listContainer = document.getElementById("questionList");
-    listContainer.innerHTML = "";
-    
+    const container = document.getElementById("questionList");
+    container.innerHTML = "";
     questions.forEach((q, index) => {
         const item = document.createElement("div");
         item.classList.add("question-item");
         item.innerHTML = `
-            <div>
-                <b>${index + 1}. ${q.question}</b>
-                <div style="font-size:12px; opacity:0.7; margin-top:5px;">Đáp án đúng: vị trí thứ ${String.fromCharCode(65 + q.correct)}</div>
-            </div>
+            <div><b>${index + 1}. ${q.question}</b><div style='font-size:12px;opacity:0.7;'>Đáp án đúng: vị trí ${String.fromCharCode(65+q.correct)}</div></div>
             <button class="delete-btn" onclick="deleteQuestion(${index})">🗑️ Xóa câu này</button>
         `;
-        listContainer.appendChild(item);
+        container.appendChild(item);
     });
 }
 
 function deleteQuestion(index) {
-    if (confirm("Bạn có chắc chắn muốn xóa câu hỏi này khỏi kho đề không?")) {
-        questions.splice(index, 1);
-        showQuestionList();
-        loadQuestion();
-    }
+    if (confirm("Xóa câu hỏi này?")) { questions.splice(index, 1); showQuestionList(); loadQuestion(); }
 }
 
-// --- Di chuyển nhân vật ---
-function movePlayer(offset) {
-    playerX += offset;
-    if (playerX < 0) playerX = 0;
-    if (playerX > gameWorldEl.clientWidth - 100) playerX = gameWorldEl.clientWidth - 100;
-    updatePlayer();
-}
-
-function playerJump() {
-    if (isJumping) return;
-    isJumping = true;
-    let upInterval = setInterval(() => {
-        playerY += 6;
-        updatePlayer();
-        if (playerY >= 100) {
-            clearInterval(upInterval);
-            let downInterval = setInterval(() => {
-                playerY -= 6;
-                updatePlayer();
-                if (playerY <= 0) {
-                    clearInterval(downInterval);
-                    playerY = 0;
-                    isJumping = false;
-                    updatePlayer();
-                }
-            }, 15);
-        }
-    }, 15);
-}
-
-function updatePlayer() {
-    playerEl.style.left = playerX + "px";
-    playerEl.style.bottom = (70 + playerY) + "px";
-}
-
-window.addEventListener("keydown", (e) => {
-    if (e.key === "ArrowRight") movePlayer(20);
-    if (e.key === "ArrowLeft") movePlayer(-20);
-    if (e.key === " " || e.key === "ArrowUp") playerJump();
-});
-
-// --- Khởi tạo lại game ---
 function handleGameOver() {
-    alert(`☠️ GAME OVER!\nChiến binh ngã xuống tại Wave ${currentWave}. Cố gắng giải toán chuẩn hơn lần sau nhé!`);
+    alert(`☠️ GAME OVER! Bạn ngã xuống tại Wave ${currentWave}.`);
     resetGame();
 }
 
 function resetGame() {
-    hp = 100;
-    maxHp = 100;
-    playerX = 50;
-    playerY = 0;
-    level = 1;
-    xp = 0;
-    coins = 50;
-    currentWave = 1;
-    monstersLeftInWave = 1;
-    hasX2Damage = false;
-    hasX2Xp = false;
-    selectedSkillId = 0;
-    
+    level = 1; xp = 0; coins = 50; currentWave = 1; monstersLeftInWave = 1;
+    hasX2Damage = false; hasX2Xp = false;
     document.getElementById("shopX2Dam").style.background = "rgba(255, 255, 255, 0.05)";
     document.getElementById("shopX2Xp").style.background = "rgba(255, 255, 255, 0.05)";
-    
-    skills.forEach((s, i) => { if (i > 0) s.unlocked = false; });
-    
-    spawnNextMonster();
-    loadQuestion();
-    renderSkills();
-    updateStats();
-    updatePlayer();
-    document.getElementById("storyText").innerText = "⚔️ Game đã được khôi phục trạng thái ban đầu!";
+    openHeroSelection();
 }
 
-// Chạy hệ thống
 window.onload = initGame;
 </script>
 </body>
